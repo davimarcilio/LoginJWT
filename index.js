@@ -12,6 +12,13 @@ mongoose.connect(process.env.MONGO_CONNECTION_URL, { useNewUrlParser: true, useU
     }
 
 });
+app.use('*', (req, res, next) => {
+    if (req.headers['x-forwarded-proto'] === 'https') {
+        next();
+    } else {
+        res.redirect('https://' + req.headers.host + req.originalUrl);
+    }
+})
 app.use('/user', express.json(), userRouter);
 app.use('/admin', express.json(), adminRouter);
 app.listen(process.env.PORT, () => {
